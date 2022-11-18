@@ -1,4 +1,4 @@
-repoPath: PIP/pipe-task-hello-world
+repoPath: Varsha-Arun/pipe-task-node-snippet
 mainBranch: main
 gitIntegration: int_github
 artIntegration: int_artifactory
