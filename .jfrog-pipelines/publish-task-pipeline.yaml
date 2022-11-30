@@ -74,6 +74,6 @@ pipelines:
               id: nodejs_snippet_test
               input:
                 path-to-nodejs-file: "developer"
-                nodejs-script: "echo hello world
+                nodejs-script: "echo hello world"
           onComplete:
             - echo "Step done!"
