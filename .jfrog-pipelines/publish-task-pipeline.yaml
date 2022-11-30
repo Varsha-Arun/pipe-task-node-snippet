@@ -2,7 +2,7 @@ template: true
 valuesFilePath: ./values.yml
 
 resources:
-  - name: hello_world_task_publish_gitrepo
+  - name: nodejs_snippet_task_publish_gitrepo
     type: GitRepo
     configuration:
       path: {{ .Values.repoPath }}
@@ -12,7 +12,7 @@ resources:
       cloneProtocol: https
 
 pipelines:
-  - name: hello_world_task_publish
+  - name: nodejs_task_publish
     configuration:
       jfrogCliVersion: 2
       runtime:
@@ -24,16 +24,16 @@ pipelines:
             autoPull: true
       environmentVariables:
         readOnly:
-          TASK_NAME: hello-world
+          TASK_NAME: nodejs-snippet
           TASK_VERSION: 0.0.0
           TASK_REPOSITORY: pipelines-tasks-local
           RESOLVE_REPO: npm-virtual
     steps:
-      - name: build_and_publish_task
+      - name: nodejs_snippet_build_and_publish_task
         type: Bash
         configuration:
           inputResources:
-            - name: hello_world_task_publish_gitrepo
+            - name: nodejs_snippet_task_publish_gitrepo
               trigger: false
           integrations:
             - name: {{ .Values.artIntegration }}
@@ -41,8 +41,7 @@ pipelines:
           onExecute:
             # Make sure version was provided
             - test -n "$TASK_VERSION" -a "$TASK_VERSION" != "0.0.0"
-
-            - pushd $res_hello_world_task_publish_gitrepo_resourcePath
+            - pushd $res_nodejs_snippet_task_publish_gitrepo_resourcePath
             # Configure JFrog CLI
             - jfrog npmc --repo-resolve $RESOLVE_REPO
             # Install npm dependencies
@@ -52,35 +51,29 @@ pipelines:
             - popd
 
             # Run publish task
-            - task: jfrog/publish-task@v0.0.2
-              id: publish-hello-world
+            - task: jfrog/publish-task@v0.0.1
+              id: publish-nodejs-snippet
               input:
-                path: $res_hello_world_task_publish_gitrepo_resourcePath
+                path: $res_nodejs_snippet_task_publish_gitrepo_resourcePath
                 targetRepository: $TASK_REPOSITORY
                 taskName: $TASK_NAME
                 taskVersion: $TASK_VERSION
                 includePattern: ^README.md$|^dist
 
-      - name: test_published_task
+      - name: nodejs_snippet_test_published_task
         type: Bash
         configuration:
           inputSteps:
-            - name: build_and_publish_task
+            - name: nodejs_snippet_build_and_publish_task
           integrations:
             - name: {{ .Values.artIntegration }}
         execution:
           onExecute:
             # Run task
             - task: $TASK_NAME@v$TASK_VERSION
-              id: hello_world_test
+              id: nodejs_snippet_test
               input:
-                name: "developer"
-
-            # Check task output
-            - echo "task output is $OUT_hello_world_test_greeting"
-            # Check exported environment variable
-            - echo "path to greeting file is $GREETING_FILE"
-            # Check task generated file
-            - cat ./greeting.txt
+                path-to-nodejs-file: "developer"
+                nodejs-script: "echo hello world
           onComplete:
             - echo "Step done!"
