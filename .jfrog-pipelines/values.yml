@@ -1,5 +1,5 @@
 repoPath: Varsha-Arun/pipe-task-node-snippet
 mainBranch: main
-gitIntegration: int_github
+gitIntegration: varsha_github
 artIntegration: int_artifactory
 windowsNodePool:
